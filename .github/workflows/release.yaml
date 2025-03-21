@@ -1,0 +1,26 @@
+name: Release on Tag Push
+
+on:
+  push:
+    tags:
+      - "v*.*.*"  # We release on semver
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Extract Tag Name
+        id: get_tag
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Create GitHub Release with Auto-Generated Notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ env.TAG_NAME }} \
+            --generate-notes \
+            --title "Release ${{ env.TAG_NAME }}" \
+            --repo ${{ github.repository }}
