@@ -1,0 +1,41 @@
+name: "Send Logs to Loki"
+description: "Aggregate all workflow logs and send them to Loki with injected labels"
+inputs:
+  loki_endpoint:
+    description: "Loki push endpoint"
+    required: true
+  labels:
+    description: "Custom labels for logs (comma-separated key=value pairs)"
+    required: false
+    default: "job=github-actions"
+  github_token:
+    description: "GitHub token for API authentication"
+    required: true
+  max_retries:
+    description: "Maximum number of retry attempts for fetching logs"
+    required: false
+    default: "5"
+  retry_interval_seconds:
+    description: "Interval in seconds between retry attempts"
+    required: false
+    default: "10"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        echo "Installing Python dependencies..."
+        pip install -r "$GITHUB_ACTION_PATH/requirements.txt"
+
+    - name: Fetch and Push Logs to Loki
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        RUN_ID: ${{ github.run_id }}
+        LOKI_ENDPOINT: ${{ inputs.loki_endpoint }}
+        LABELS: ${{ inputs.labels }}
+        MAX_RETRIES: ${{ inputs.max_retries }}
+        RETRY_INTERVAL_SECONDS: ${{ inputs.retry_interval_seconds }}
+      run: python3 "$GITHUB_ACTION_PATH/push_logs.py"
