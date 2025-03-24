@@ -1,6 +1,8 @@
 # Send Logs to Loki GitHub Action
 
-The **Send Logs to Loki** GitHub Action collects logs from all jobs in a GitHub Actions workflow and sends them to a Loki instance. Logs are labeled with metadata like job names, job IDs, and custom labels, making them easily searchable and organized in Loki.
+The **Send Logs to Loki** GitHub Action collects logs from all jobs in a GitHub Actions workflow and sends them to a Loki instance. 
+
+Logs are labeled with metadata like job names, job IDs, and custom labels, making them easily searchable and organized in Loki.
 
 ## Features
 
