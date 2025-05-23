@@ -98,7 +98,7 @@ def main():
 
         if logs_to_send:
             print(f"Sending {len(logs_to_send)} log lines to Loki for job {name}...")
-            push_to_loki(logs_to_send, LABELS, job_name=name, job_id=job_id)
+            push_to_loki(logs_to_send, LABELS, job_name=name)
         else:
             print(f"No logs to send for job {name}.")
 
