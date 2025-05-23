@@ -46,7 +46,7 @@ The **Send Logs to Loki** GitHub Action collects logs from all jobs in a GitHub 
 - **Loki Endpoint**: Specify the Loki instance URL with `loki_endpoint`.
 - **Retry Configuration**: Use the `max_retries` and `retry_interval_seconds` inputs to control log fetch retry behavior.
 
-By default, the `job_id` and `job_name` are automatically added as labels for each job. (Be mindful of cardinality!)
+By default, `job_name` are automatically added as labels for each job. (Be mindful of cardinality!)
 
 ## Dependencies
 
