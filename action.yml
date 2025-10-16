@@ -8,6 +8,14 @@ inputs:
     description: "Custom labels for logs (comma-separated key=value pairs)"
     required: false
     default: "job=github-actions"
+  tenant:
+    description: "Loki tenant"
+    required: false
+    default: "action-send-logs-to-loki"
+  structured_metadata:
+    description: "Structured metadata for logs (comma-separated key=value pairs)"
+    required: false
+    default: ""
   github_token:
     description: "GitHub token for API authentication"
     required: true
@@ -19,6 +27,14 @@ inputs:
     description: "Interval in seconds between retry attempts"
     required: false
     default: "10"
+  collapse_json_logs:
+    description: "Collapse multi-line pretty-printed JSON into single log lines"
+    required: false
+    default: "true"
+  json_wrap:
+    description: "Wrap non-JSON logs with JSON message key"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -35,7 +51,11 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         RUN_ID: ${{ github.run_id }}
         LOKI_ENDPOINT: ${{ inputs.loki_endpoint }}
+        TENANT: ${{ inputs.tenant }}
         LABELS: ${{ inputs.labels }}
         MAX_RETRIES: ${{ inputs.max_retries }}
         RETRY_INTERVAL_SECONDS: ${{ inputs.retry_interval_seconds }}
+        STRUCTURED_METADATA: ${{ inputs.structured_metadata }}
+        JSON_WRAP: ${{ inputs.json_wrap }}
+        COLLAPSE_JSON_LOGS: ${{ inputs.collapse_json_logs }}
       run: python3 "$GITHUB_ACTION_PATH/push_logs.py"
