@@ -7,6 +7,7 @@ The **Send Logs to Loki** GitHub Action collects logs from all jobs in a GitHub 
 - Aggregates logs from all jobs in a workflow, including job-specific logs.
 - Allows dynamic injection of custom labels.
 - Automatically retries fetching logs if they are not immediately available.
+- **NEW:** Optionally send a custom message to Loki, bypassing GitHub Actions logs.
 
 ## Inputs
 
@@ -16,7 +17,8 @@ The **Send Logs to Loki** GitHub Action collects logs from all jobs in a GitHub 
 | `labels`                | Custom labels for logs (comma-separated key=value pairs)   | No       | `job=github-actions` |
 | `github_token`          | GitHub token for API authentication                        | Yes      |                      |
 | `max_retries`           | Maximum number of retry attempts for fetching logs per job | No      |  5                   |
-| `retry_interval_seconds`| Interval in seconds between retry attempts                 | No      |  10                   |
+| `retry_interval_seconds`| Interval in seconds between retry attempts                 | No      |  10                  |
+| `message_to_loki`       | Custom message to send directly to Loki (skips job logs)   | No      |                      |
 
 ## Example Usage
 
@@ -31,16 +33,20 @@ The **Send Logs to Loki** GitHub Action collects logs from all jobs in a GitHub 
     loki_endpoint: "https://loki.example.com"
     labels: "job=github-actions,run_id=${{ github.run_id }}"
     github_token: ${{ secrets.GITHUB_TOKEN }}
+    message_to_loki: "Deployment started by ${{ github.actor }}"
 ```
 
 ## How It Works
 
-1. **Log Aggregation**: The action iterates over all jobs in the workflow using the GitHub Actions API.
-2. **Log Retrieval**: Logs are fetched for completed jobs and skipped for jobs still in progress.
-3. **Log Transmission**: Logs are sent to Loki with the specified labels.
+1. **Custom Message Mode**: If the `message_to_loki` input (or `MESSAGE_TO_LOKI` env var) is set, the action sends only this message to Loki and skips all GitHub Actions logs.
+2. **Log Aggregation**: Otherwise, the action iterates over all jobs in the workflow using the GitHub Actions API.
+3. **Log Retrieval**: Logs are fetched for completed jobs and skipped for jobs still in progress.
+4. **Log Transmission**: Logs are sent to Loki with the specified labels.
 
 ## How to Configure
 
+- **Send a Custom Message**: Set the `message_to_loki` input (or `MESSAGE_TO_LOKI` environment variable) to send a single message to Loki, ignoring all job logs.
+  - Example: `message_to_loki: "Manual trigger by admin"`
 - **Add Custom Labels**: Use the `labels` input to include additional metadata for your logs.
   - Example: `labels: "job=github-actions,env=production"`
 - **Loki Endpoint**: Specify the Loki instance URL with `loki_endpoint`.

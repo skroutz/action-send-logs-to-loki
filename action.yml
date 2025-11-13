@@ -19,6 +19,9 @@ inputs:
     description: "Interval in seconds between retry attempts"
     required: false
     default: "10"
+  message_to_loki:
+    description: "Custom message to send directly to Loki (skips job logs)"
+    required: false
 
 runs:
   using: "composite"
@@ -38,4 +41,5 @@ runs:
         LABELS: ${{ inputs.labels }}
         MAX_RETRIES: ${{ inputs.max_retries }}
         RETRY_INTERVAL_SECONDS: ${{ inputs.retry_interval_seconds }}
+        MESSAGE_TO_LOKI: ${{ inputs.message_to_loki }}
       run: python3 "$GITHUB_ACTION_PATH/push_logs.py"
