@@ -20,7 +20,7 @@ inputs:
     required: false
     default: "10"
   message_to_loki:
-    description: "Custom message to send directly to Loki (skips job logs)"
+    description: "Custom message(s) to send directly to Loki (skips job logs). Supports multiple lines — each line is sent as a separate log entry."
     required: false
 
 runs:
