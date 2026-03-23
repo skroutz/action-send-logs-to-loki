@@ -7,7 +7,7 @@ The **Send Logs to Loki** GitHub Action collects logs from all jobs in a GitHub 
 - Aggregates logs from all jobs in a workflow, including job-specific logs.
 - Allows dynamic injection of custom labels.
 - Automatically retries fetching logs if they are not immediately available.
-- **NEW:** Optionally send a custom message to Loki, bypassing GitHub Actions logs.
+- Send one or more custom messages to Loki, bypassing GitHub Actions logs.
 
 ## Inputs
 
@@ -18,7 +18,7 @@ The **Send Logs to Loki** GitHub Action collects logs from all jobs in a GitHub 
 | `github_token`          | GitHub token for API authentication                        | Yes      |                      |
 | `max_retries`           | Maximum number of retry attempts for fetching logs per job | No      |  5                   |
 | `retry_interval_seconds`| Interval in seconds between retry attempts                 | No      |  10                  |
-| `message_to_loki`       | Custom message to send directly to Loki (skips job logs)   | No      |                      |
+| `message_to_loki`       | Custom message(s) to send directly to Loki (skips job logs). Supports multiple lines — each line is sent as a separate log entry. Optionally append per-line labels with a pipe separator: `message | key=value,key=value` (spaces around `\|` are optional). | No      |                      |
 
 ## Example Usage
 
@@ -33,20 +33,35 @@ The **Send Logs to Loki** GitHub Action collects logs from all jobs in a GitHub 
     loki_endpoint: "https://loki.example.com"
     labels: "job=github-actions,run_id=${{ github.run_id }}"
     github_token: ${{ secrets.GITHUB_TOKEN }}
-    message_to_loki: "Deployment started by ${{ github.actor }}"
+    message_to_loki: |
+      Deployment started by ${{ github.actor }}
+      Version: ${{ github.sha }}
 ```
 
 ## How It Works
 
-1. **Custom Message Mode**: If the `message_to_loki` input (or `MESSAGE_TO_LOKI` env var) is set, the action sends only this message to Loki and skips all GitHub Actions logs.
+1. **Custom Message Mode**: If the `message_to_loki` input (or `MESSAGE_TO_LOKI` env var) is set, the action sends only these messages to Loki and skips all GitHub Actions logs. Each non-empty line is treated as a separate log entry.
 2. **Log Aggregation**: Otherwise, the action iterates over all jobs in the workflow using the GitHub Actions API.
 3. **Log Retrieval**: Logs are fetched for completed jobs and skipped for jobs still in progress.
 4. **Log Transmission**: Logs are sent to Loki with the specified labels.
 
 ## How to Configure
 
-- **Send a Custom Message**: Set the `message_to_loki` input (or `MESSAGE_TO_LOKI` environment variable) to send a single message to Loki, ignoring all job logs.
+- **Send Custom Messages**: Set the `message_to_loki` input (or `MESSAGE_TO_LOKI` environment variable) to send one or more messages to Loki, ignoring all job logs. Use a multiline YAML string to send multiple entries. Lines sharing the same label set are grouped into a single Loki push request; lines with different label sets result in one push request per distinct label set.
   - Example: `message_to_loki: "Manual trigger by admin"`
+  - Multiline example:
+    ```yaml
+    message_to_loki: |
+      Manual trigger by admin
+      Environment: production
+    ```
+  - Per-message labels example:
+    ```yaml
+    message_to_loki: |
+      Deployment started | env=production,service=api
+      Cache warmed up | env=production,service=cache
+      A message with only global labels
+    ```
 - **Add Custom Labels**: Use the `labels` input to include additional metadata for your logs.
   - Example: `labels: "job=github-actions,env=production"`
 - **Loki Endpoint**: Specify the Loki instance URL with `loki_endpoint`.

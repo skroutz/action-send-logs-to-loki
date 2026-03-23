@@ -81,8 +81,25 @@ def push_to_loki(logs, labels, loki_endpoint, job_name=None, job_id=None):
 
 
 def send_custom_message_to_loki(message, labels, loki_endpoint):
-    print("MESSAGE_TO_LOKI is set. Sending only this message to Loki and skipping GitHub Actions logs.")
-    push_to_loki([message], labels, loki_endpoint)
+    print("MESSAGE_TO_LOKI is set. Sending custom message(s) to Loki and skipping GitHub Actions logs.")
+
+    # Parse lines into (message, labels) pairs.
+    # Optional per-line labels via pipe separator: "my message | env=prod,service=api"
+    groups = {}  # labels_string -> [messages]
+    for line in message.splitlines():
+        if not line.strip():
+            continue
+        if "|" in line:
+            msg, extra_labels = line.split("|", 1)
+            line_labels = f"{labels},{extra_labels.strip()}"
+        else:
+            msg = line
+            line_labels = labels
+        groups.setdefault(line_labels, []).append(msg)
+
+    for line_labels, lines in groups.items():
+        print(f"Sending {len(lines)} message line(s) to Loki with labels: {line_labels}...")
+        push_to_loki(lines, line_labels, loki_endpoint)
 
 def send_github_logs_to_loki(env):
     jobs = get_jobs(env["RUN_ID"], env["GITHUB_REPO"], env["HEADERS"])
