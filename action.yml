@@ -26,11 +26,18 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+
     - name: Install Dependencies
       shell: bash
       run: |
         echo "Installing Python dependencies..."
-        pip install -r "$GITHUB_ACTION_PATH/requirements.txt"
+        python3 -m venv "$GITHUB_ACTION_PATH/.venv"
+        "$GITHUB_ACTION_PATH/.venv/bin/python" -m pip install --upgrade pip
+        "$GITHUB_ACTION_PATH/.venv/bin/pip" install -r "$GITHUB_ACTION_PATH/requirements.txt"
 
     - name: Fetch and Push Logs to Loki
       shell: bash
@@ -42,4 +49,5 @@ runs:
         MAX_RETRIES: ${{ inputs.max_retries }}
         RETRY_INTERVAL_SECONDS: ${{ inputs.retry_interval_seconds }}
         MESSAGE_TO_LOKI: ${{ inputs.message_to_loki }}
-      run: python3 "$GITHUB_ACTION_PATH/push_logs.py"
+      run: |
+        "$GITHUB_ACTION_PATH/.venv/bin/python" "$GITHUB_ACTION_PATH/push_logs.py"
