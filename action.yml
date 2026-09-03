@@ -22,15 +22,24 @@ inputs:
   message_to_loki:
     description: "Custom message(s) to send directly to Loki (skips job logs). Supports multiple lines — each line is sent as a separate log entry."
     required: false
+  python_version:
+    description: "Python version to use for sending logs"
+    required: false
+    default: "3.12"
 
 runs:
   using: "composite"
   steps:
+    - name: Set up Python
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      with:
+        python-version: ${{ inputs.python_version }}
+
     - name: Install Dependencies
       shell: bash
       run: |
         echo "Installing Python dependencies..."
-        pip install -r "$GITHUB_ACTION_PATH/requirements.txt"
+        python -m pip install -r "$GITHUB_ACTION_PATH/requirements.txt"
 
     - name: Fetch and Push Logs to Loki
       shell: bash
@@ -42,4 +51,4 @@ runs:
         MAX_RETRIES: ${{ inputs.max_retries }}
         RETRY_INTERVAL_SECONDS: ${{ inputs.retry_interval_seconds }}
         MESSAGE_TO_LOKI: ${{ inputs.message_to_loki }}
-      run: python3 "$GITHUB_ACTION_PATH/push_logs.py"
+      run: python "$GITHUB_ACTION_PATH/push_logs.py"
