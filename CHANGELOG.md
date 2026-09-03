@@ -1,5 +1,16 @@
 # Changelog
 
+## [v0.0.5] - 2026-09-03
+
+### Added
+
+- Set up Python with `actions/setup-python` before installing dependencies and sending logs.
+- Added the configurable `python_version` input, defaulting to Python `3.12`.
+
+### Changed
+
+- Use the configured `python` interpreter consistently for dependency installation and log sending.
+
 ## [v0.0.4] - 2026-03-23
 
 ### Added
@@ -29,6 +40,13 @@
 ---
 
 # Release Notes
+
+## v0.0.5
+
+- **Feature:** Python is set up automatically before the action runs, with the version configurable
+  through the new `python_version` input and a default of `3.12`.
+- **Improvement:** Dependencies and the log-sending script now run through the configured Python
+  interpreter for consistent behavior across runners.
 
 ## v0.0.4
 
