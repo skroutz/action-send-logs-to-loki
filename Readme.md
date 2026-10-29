@@ -11,14 +11,15 @@ The **Send Logs to Loki** GitHub Action collects logs from all jobs in a GitHub 
 
 ## Inputs
 
-| Name                    | Description                                                | Required | Default              |
-| ----------------------- | -----------------------------------------------------------| -------- | -------------------- |
-| `loki_endpoint`         | Loki push endpoint                                         | Yes      |                      |
-| `labels`                | Custom labels for logs (comma-separated key=value pairs)   | No       | `job=github-actions` |
-| `github_token`          | GitHub token for API authentication                        | Yes      |                      |
-| `max_retries`           | Maximum number of retry attempts for fetching logs per job | No      |  5                   |
-| `retry_interval_seconds`| Interval in seconds between retry attempts                 | No      |  10                  |
-| `message_to_loki`       | Custom message(s) to send directly to Loki (skips job logs). Supports multiple lines — each line is sent as a separate log entry. Optionally append per-line labels with a pipe separator: `message | key=value,key=value` (spaces around `\|` are optional). | No      |                      |
+| Name                     | Description                                                | Required | Default              |
+| ------------------------ | -----------------------------------------------------------| -------- | -------------------- |
+| `loki_endpoint`          | Loki push endpoint                                         | Yes      |                      |
+| `labels`                 | Custom labels for logs (comma-separated key=value pairs)   | No       | `job=github-actions` |
+| `github_token`           | GitHub token for API authentication                        | Yes      |                      |
+| `max_retries`            | Maximum number of retry attempts for fetching logs per job | No      |  5                   |
+| `retry_interval_seconds` | Interval in seconds between retry attempts                 | No      |  10                  |
+| `message_to_loki`        | Custom message(s) to send directly to Loki (skips job logs). Supports multiple lines — each line is sent as a separate log entry. Optionally append per-line labels with a pipe separator: `message | key=value,key=value` (spaces around `\|` are optional). | No      |                      |
+| `install_python_and_pip` | Install python and pip packages via setup-python           | No        | true                |
 
 ## Example Usage
 
