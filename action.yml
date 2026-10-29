@@ -26,16 +26,22 @@ inputs:
     description: "Python version to use for sending logs"
     required: false
     default: "3.12"
+  install_python_and_pip:
+    description: "Install python and pip dependencies"
+    required: false
+    default: true
 
 runs:
   using: "composite"
   steps:
     - name: Set up Python
+      if: ${{ inputs.install_python_and_pip == 'true' }}
       uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       with:
         python-version: ${{ inputs.python_version }}
 
     - name: Install Dependencies
+      if: ${{ inputs.install_python_and_pip == 'true' }}
       shell: bash
       run: |
         echo "Installing Python dependencies..."
